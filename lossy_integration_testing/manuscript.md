@@ -7,7 +7,6 @@ packets at different times, and sometimes with collisions, can cause drivers to 
 states and hang. Also we want to do regression testing of the functionality when adding new
 features as it is easy to break the timing requirements of the network.
 
-
 ### TLDR
 
 We want to integration test the communication of an RF device together with timing requirements of
@@ -16,7 +15,7 @@ events over a lossy medium to each other.
 
 ## How can a rudimentary test protocol look like?
 
-Bellow follows example of all the features that should be tested:
+Bellow follows a simple example of the features that could be tested:
 
 ### Basic tests
 
@@ -63,7 +62,7 @@ Bellow follows example of all the features that should be tested:
 | **Test** | **Description** | **Pass / Fail** |
 | -------- | --------------- | :-------------: |
 | Synchronize to another clock                      | Receive packages with that include the current clock value and synchronize the clocks.                                                                | **FAIL** |
-| Synchronize to another clock (with clock tune)    | Receive packages with that include the current clock value and synchronize the clocks. Use the DW1000 clock tune to get rid of most of the error.     | **FAIL** |
+| Synchronize to another clock (with clock tune)    | Receive packages with that include the current clock value and synchronize the clocks. Use the clock tune register to get rid of most of the error.     | **FAIL** |
 
 ### Frame synchronization
 
@@ -81,35 +80,19 @@ Each connected unit communicates over a serial.
 let firmware1 = Firmware::new("tests/test_1_send");
 let firmware2 = Firmware::new("tests/test_1_rec");
 
-// Flashing firmware
-firmware1.flash();
-firmware2.flash();
-
-
-
 // Serials
 let serial1 = Serial::new("/dev/ttyACM0");
 let serial2 = Serial::new("/dev/ttyACM1");
 
-//
-// Somehow match serial to firmware...
-//
-let firmware1_link = ...;
-let firmware2_link = ...;
+// Somehow define devices...
+let devices = Devices::new().with_device(firmware1, serial1).with_device(firmware2, serial2).done();
 
+// Flash and run
+devices.flash();
 
-//
 // Somehow define tests...
-//
-let test = exptect(&firmware1_link, "Send abc %i").expect(&firmware2_link, "Received abc %i").pass();
-
-
-// Reset and run
-firmware1.reset();
-firmware2.reset();
-
-// Link firmware and serial
-link_firmware(...);
+// I think that %s would be some string that must match on both sender and receiver. Or something...
+let test = Test::new().exptect(&devices[0], "Send abc %s").expect(&devices[1], "Received abc %s").done();
 
 // Run the test
 test.run()
