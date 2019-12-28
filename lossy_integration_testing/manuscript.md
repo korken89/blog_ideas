@@ -15,7 +15,7 @@ events over a lossy medium to each other.
 
 ## How can a rudimentary test protocol look like?
 
-Bellow follows a simple example of the features that could be tested:
+Bellow follows a simple example of a test protocol that tests features:
 
 ### Basic tests
 
@@ -69,6 +69,7 @@ Bellow follows a simple example of the features that could be tested:
 | **Test** | **Description** | **Pass / Fail** |
 | -------- | --------------- | :-------------: |
 | Synchronize to super frames and send/receive      | Receive packages with that include the current frame time synchronize the sending to a free slot, while receiving in the other slot.    | **FAIL** |
+| ... | ... | **FAIL** |
 
 
 ## Test framework design
@@ -92,6 +93,7 @@ devices.flash();
 
 // Somehow define tests...
 // I think that %s would be some string that must match on both sender and receiver. Or something...
+// Not sure here, maybe use async?
 let test = Test::new().exptect(&devices[0], "Send abc %s").expect(&devices[1], "Received abc %s").done();
 
 // Run the test
